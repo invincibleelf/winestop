@@ -9,21 +9,17 @@ import java.util.logging.Logger;
 import javax.inject.Named;
 
 import com.codebreaker.winestop.Constants;
-import com.codebreaker.winestop.HelloGreeting;
+import com.codebreaker.winestop.domain.DiscountCopoun;
 import com.codebreaker.winestop.domain.Product;
 import com.codebreaker.winestop.domain.ProductCategory;
-import com.codebreaker.winestop.domain.Profile;
 import com.codebreaker.winestop.form.ProductForm;
-import com.codebreaker.winestop.form.ProfileForm;
 import com.codebreaker.winestop.util.CustomException;
 import com.codebreaker.winestop.util.Discount;
-import com.codebreaker.winestop.util.Role;
 import com.codebreaker.winestop.util.ValidationUtil;
 import com.codebreaker.winestop.util.ValidationUtilImpl;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
-import com.google.api.server.spi.response.NotFoundException;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.users.User;
 import com.google.appengine.labs.repackaged.com.google.common.collect.Iterables;
@@ -83,7 +79,8 @@ public class WinestopApi {
 	}
 
 	@ApiMethod(name = "updateProductCategory", path = "updateproductcategory", httpMethod = HttpMethod.POST)
-	public ProductCategory updateProductCategory(final User user, final ProductForm productForm) throws UnauthorizedException, CustomException {
+	public ProductCategory updateProductCategory(final User user, final ProductForm productForm)
+			throws UnauthorizedException, CustomException {
 		if (user == null) {
 			throw new UnauthorizedException(
 					"Authorization required. Please Login to your google account and allow access.");
@@ -92,34 +89,35 @@ public class WinestopApi {
 		if (productForm.getCategoryName().isEmpty()) {
 			throw new NullPointerException("Name of product Categories is Required");
 		}
-		
-		if(productForm.getProductCategoryId() ==0){
+
+		if (productForm.getProductCategoryId() == 0) {
 			throw new NullPointerException("Product Categories not found");
 		}
-		
+
 		LOG.info("Get Product Categories for updating");
-		ProductCategory productCategory = ofy().load().key(Key.create(ProductCategory.class,productForm.getProductCategoryId())).now();
-		if(productCategory == null){
+		ProductCategory productCategory = ofy().load()
+				.key(Key.create(ProductCategory.class, productForm.getProductCategoryId())).now();
+		if (productCategory == null) {
 			throw new NullPointerException("Product Categories not found");
 		}
-		
-		if(!productCategory.getCategoryName().equals(productForm.getCategoryName())){
+
+		if (!productCategory.getCategoryName().equals(productForm.getCategoryName())) {
 			LOG.info("Check if updated product category name already exists");
 			Iterable<Key<ProductCategory>> productCategoriesKeys = queryproductCategoriesByCategoryName(productForm);
 			System.out.println(Iterables.size(productCategoriesKeys));
 			if (Iterables.size(productCategoriesKeys) > 0) {
-				 throw new CustomException("Product Category already exists");
+				throw new CustomException("Product Category already exists");
 			}
 		}
-		
+
 		productCategory.setCategoryName(productForm.getCategoryName());
-		
+
 		ofy().save().entity(productCategory).now();
-		
+
 		return productCategory;
-		
+
 	}
-	
+
 	private QueryKeys<ProductCategory> queryproductCategoriesByCategoryName(final ProductForm productForm) {
 		return ofy().load().type(ProductCategory.class).filter("categoryName", productForm.getCategoryName()).keys();
 	}
@@ -143,10 +141,11 @@ public class WinestopApi {
 	 * @throws UnauthorizedException
 	 *             when the User object is null.
 	 * @throws CustomException
-	 * 				when field discountValue is greater than the price
+	 *             when field discountValue is greater than the price
 	 * @throws NullpointerException
-	 *             when the required fields in productfrom  object from client is null
-	 *             when supplied id of productcategory is not available in datastore
+	 *             when the required fields in productfrom object from client is
+	 *             null when supplied id of productcategory is not available in
+	 *             datastore
 	 */
 	@ApiMethod(name = "createProduct", path = "product", httpMethod = HttpMethod.POST)
 	public Product createProduct(final User user, final ProductForm productForm)
@@ -229,10 +228,10 @@ public class WinestopApi {
 		return product;
 
 	}
-	
+
 	/**
-	 * Returns a List of Product object. The cloud endpoints system automatically inject
-	 * the User object.
+	 * Returns a List of Product object. The cloud endpoints system
+	 * automatically inject the User object.
 	 *
 	 * @param user
 	 *            A User object injected by the cloud endpoints.
@@ -240,10 +239,11 @@ public class WinestopApi {
 	 * @throws UnauthorizedException
 	 *             when the User object is null.
 	 * @throws CustomException
-	 * 				when field discountValue is greater than the price
+	 *             when field discountValue is greater than the price
 	 * @throws NullpointerException
-	 *             when the required fields in productfrom  object from client is null
-	 *             when supplied id of productcategory is not available in datastore
+	 *             when the required fields in productfrom object from client is
+	 *             null when supplied id of productcategory is not available in
+	 *             datastore
 	 */
 	@ApiMethod(name = "getProducts", path = "product", httpMethod = HttpMethod.GET)
 	public List<ProductForm> getProducts(final User user) throws UnauthorizedException {
@@ -251,9 +251,9 @@ public class WinestopApi {
 			throw new UnauthorizedException(
 					"Authorization required. Please Login to your google account and allow access.");
 		}
-		
+
 		List<Product> products = ofy().load().type(Product.class).list();
-		
+
 		List<ProductForm> productForms = new ArrayList<>();
 		for (Product product : products) {
 			ProductForm productForm = new ProductForm();
@@ -267,68 +267,112 @@ public class WinestopApi {
 			productForm.setCategoryName(ofy().load().key(product.getTheCategory()).now().getCategoryName());
 			productForms.add(productForm);
 		}
-		
+
 		return productForms;
 
 	}
-	
-	@ApiMethod(name = "deleteProduct", path="deleteproduct" ,httpMethod = HttpMethod.POST)
-	public void deleteProduct(final User user,final ProductForm productForm) throws UnauthorizedException {
+
+	@ApiMethod(name = "deleteProduct", path = "deleteproduct", httpMethod = HttpMethod.POST)
+	public void deleteProduct(final User user, final ProductForm productForm) throws UnauthorizedException {
 		if (user == null) {
 			throw new UnauthorizedException(
 					"Authorization required. Please Login to your google account and allow access.");
 		}
-		
-		if(productForm.getProductId() == 0 || productForm.getProductCategoryId() == 0){
+
+		if (productForm.getProductId() == 0 || productForm.getProductCategoryId() == 0) {
 			throw new NullPointerException("Prodcut Id and Category  is required");
 		}
-		
-		LOG.info("Find product in datastore by ID:"+productForm.getProductId());
-		Product product = ofy().load().key(Key.create(Key.create(ProductCategory.class,productForm.getProductCategoryId()),Product.class,productForm.getProductId())).now();
-		
-		if(product == null){
+
+		LOG.info("Find product in datastore by ID:" + productForm.getProductId());
+		Product product = ofy().load()
+				.key(Key.create(Key.create(ProductCategory.class, productForm.getProductCategoryId()), Product.class,
+						productForm.getProductId()))
+				.now();
+
+		if (product == null) {
 			throw new NullPointerException("Prodcut is not found");
 		}
-		
-		
+
 		ofy().delete().entity(product).now();
-		
+
 	}
-	
-	@ApiMethod(name = "updateProduct", path="updateproduct" ,httpMethod = HttpMethod.POST)
-	public Product updateProduct(final User user,final ProductForm productForm) throws UnauthorizedException {
+
+	@ApiMethod(name = "updateProduct", path = "updateproduct", httpMethod = HttpMethod.POST)
+	public Product updateProduct(final User user, final ProductForm productForm) throws UnauthorizedException {
 		if (user == null) {
 			throw new UnauthorizedException(
 					"Authorization required. Please Login to your google account and allow access.");
 		}
-		if(productForm.getProductId() == 0 || productForm.getProductCategoryId() == 0) {
+		if (productForm.getProductId() == 0 || productForm.getProductCategoryId() == 0) {
 			throw new NullPointerException("ProductId is null");
 		}
-		
+
 		if (!validationForm.validateProductFormFields(productForm)) {
 			throw new NullPointerException("Required Fields are missing.");
 		}
-		
+
 		productForm.setDiscountType(Discount.NONE);
 		productForm.setDiscountValue(0);
 
-		LOG.info("Find product in datastore by ID:"+productForm.getProductId());
-		Product product = ofy().load().key(Key.create(Key.create(ProductCategory.class,productForm.getProductCategoryId()),Product.class,productForm.getProductId())).now();
-		
-		if(product == null){
+		LOG.info("Find product in datastore by ID:" + productForm.getProductId());
+		Product product = ofy().load()
+				.key(Key.create(Key.create(ProductCategory.class, productForm.getProductCategoryId()), Product.class,
+						productForm.getProductId()))
+				.now();
+
+		if (product == null) {
 			throw new NullPointerException("Product is not found");
 		}
-		
+
 		product.setBarcode(productForm.getBarcode());
 		product.setName(productForm.getName());
 		product.setPrice(productForm.getPrice());
 		product.setQuantity(productForm.getQuantity());
 		product.setDiscountType(productForm.getDiscountType());
 		product.setDiscountValue(productForm.getDiscountValue());
-		product.setTheCategory(Key.create(ProductCategory.class,productForm.getNewProductCategoryId()));
-		
+		product.setTheCategory(Key.create(ProductCategory.class, productForm.getNewProductCategoryId()));
+
 		LOG.info("Saving product");
 		ofy().save().entity(product).now();
 		return product;
+	}
+
+	@ApiMethod(name = "getProductByBarcode", path = "getproduct/{barcode}", httpMethod = HttpMethod.GET)
+	public Product getProductByBarcode(final User user, @Named("barcode") final String barcode)
+			throws UnauthorizedException, CustomException {
+		if (user == null) {
+			throw new UnauthorizedException(
+					"Authorization required. Please Login to your google account and allow access.");
+		}
+		LOG.info("Get product with barcode index");
+		List<Product> products = ofy().load().type(Product.class).filter("barcode =", barcode).list();
+
+		if (products == null || products.size() == 0) {
+			throw new CustomException("Product not found");
+		}
+
+		Product product = products.get(0);
+
+		return product;
+	}
+
+	@ApiMethod(name = "getDiscountAmount", path = "getdiscount/{discountCode}", httpMethod = HttpMethod.GET)
+	public DiscountCopoun getDiscountAmount(final User user, @Named("discountCode") final String discountCode)
+			throws UnauthorizedException, CustomException {
+
+		if (user == null) {
+			throw new UnauthorizedException(
+					"Authorization required. Please Login to your google account and allow access.");
+		}
+		LOG.info("Get DiscountCopoun");
+		List<DiscountCopoun> discountCopouns = ofy().load().type(DiscountCopoun.class).filter("discountCode =",discountCode).list();
+		
+		if(discountCopouns == null || discountCopouns.size() == 0){
+			 throw new CustomException("Invalid Discount Code");
+		}
+		
+		DiscountCopoun discountCopoun = discountCopouns.get(0);
+		
+		return discountCopoun;
 	}
 }

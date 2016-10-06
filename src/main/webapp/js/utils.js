@@ -44,7 +44,21 @@ window.operateEvents = {
 		google.devrel.removeProduct(row);
 	},
 	'click .update-cat' : function(e, value, row, index) {
-		google.devrel.showUpdateProductCatDiv(e,row);
+		google.devrel.showUpdateProductCatDiv(e, row);
+	}
+
+};
+
+utils.operateFormatterForSale = function(value, row, index) {
+	return [
+			'<a class="remove tweakedpadding" href="javascript:void(0)" title="delete">',
+			'<i class="glyphicon glyphicon-remove-circle"></i>', '</a>' ]
+			.join('');
+}
+
+window.operateEventsForSale = {
+	'click .remove' : function(e, value, row, index) {
+		console.log("test");
 	}
 
 };

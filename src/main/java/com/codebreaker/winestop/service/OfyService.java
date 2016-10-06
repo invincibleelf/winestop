@@ -1,5 +1,6 @@
 package com.codebreaker.winestop.service;
 
+import com.codebreaker.winestop.domain.DiscountCopoun;
 import com.codebreaker.winestop.domain.Product;
 import com.codebreaker.winestop.domain.ProductCategory;
 import com.codebreaker.winestop.domain.Profile;
@@ -15,6 +16,7 @@ public class OfyService {
         factory().register(Profile.class);
         factory().register(ProductCategory.class);
         factory().register(Product.class);
+        factory().register(DiscountCopoun.class);
     }
     
     public static Objectify ofy() {

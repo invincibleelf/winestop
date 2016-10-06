@@ -31,10 +31,9 @@
 				</div>
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
-						<li><a class="active" href="javascript:void(0);"
-							id="salesButton">Sales</a></li>
-						<li class="active"><a href="javascript:void(0);"
-							id="productsNavButton">Products</a></li>
+						<li class="active"><a class="active"
+							href="javascript:void(0);" id="salesNavButton">Sales</a></li>
+						<li><a href="javascript:void(0);" id="productsNavButton">Products</a></li>
 						<li><a href="javascript:void(0);" id="reportButton">Report</a></li>
 						<li><a href="javascript:void(0);" id="reportButton">Customers</a></li>
 					</ul>
@@ -50,8 +49,57 @@
 
 	<div class="container" style="margin-top: 20px;">
 		<div id="message"></div>
-		<div class="tab-pane hide" id="salesDiv">Sales</div>
-		<div class="tab-pane show " id="productsDiv">
+		<div class="tab-pane show" id="salesDiv">
+			<div class="col-lg-6">
+				<h3>Selected Wines</h3>
+				<div class="form-group">
+					<input type="text" class="form-control" name="categoryName"
+						id="barcodeScanner" placeholder="Barcode Scanner" required>
+				</div>
+
+				<table id="salesTable" class="table">
+
+				</table>
+
+
+				<form action="javascript:void(0);" novalidate>
+					<div class="form-group col-lg-6">
+						<label for="totalPrice">Total Price</label> <input type="number"
+							class="form-control" name="totalPrice" id="totalPrice"
+							placeholder="" required readonly>
+					</div>
+					<div class="form-group col-lg-6">
+						<label for="totalPrice">Total Quantity</label> <input type="number"
+							class="form-control" name="totalQuantity" id="totalQuantity"
+							placeholder="" required readonly>
+					</div>
+					<div class="form-group col-lg-6">
+						<label for="discountCode">Discount Code</label> <input type="text"
+							class="form-control" name="discountCode" id="discountCode"
+							placeholder="Discount Code">
+					</div>
+					<div class="form-group col-lg-6">
+						<label for="discountSale">Sale Discount</label> <input type="number"
+							class="form-control" name="discountSale" id="discountSale"
+							value="0" required readonly>
+					</div>
+					<div class="form-group">
+						<label for="payingPrice">Paying Price</label> <input type="number"
+							class="form-control" name="payingPrice" id="payingPrice"
+							value="0" required readonly>
+					</div>
+					<div class="form-group"></div>
+					<button id="payAmountCashBtn" onclick="javascript:void(0);" class="btn btn-success">Cash</button>
+					<button id="payAmountCreditBtn" onclick="javascript:void(0);" class="btn btn-success">Credit</button>
+				</form>
+
+
+			</div>
+			<div class="col-lg-6 pull-right">
+				Table of Products by category
+			</div>
+		</div>
+		<div class="tab-pane hide " id="productsDiv">
 			<div id="products" class="show">
 				<div class="btn-group col-lg-12 pull-right" role="group"
 					aria-label="...">
@@ -63,13 +111,13 @@
 						onclick="javascript:void(0);">Add ProductCategory</button>
 				</div>
 				<h4>Products</h4>
-				<table id="table" data-search="true" data-pagination="true">
+				<table id="productTable" data-search="true" data-pagination="true">
 				</table>
 			</div>
 
 			<div id="createProductCatDiv" class="hide col-lg-8">
 				<h1>Create Product Category</h1>
-				<form action="javascript:void(0);">
+				<form action="javascript:void(0);" novalidate>
 					<div class="form-group">
 						<label for="categoryName">CategoryName</label> <input type="text"
 							class="form-control" name="categoryName" id="categoryName"
@@ -82,11 +130,13 @@
 						class="btn btn-danger cancelBtn">Cancel</button>
 				</form>
 			</div>
-			
+
 			<div id="updateProductCatDiv" class="hide col-lg-8">
 				<h1>Update Product Category</h1>
-				<form id='updateProductCatForm' action="javascript:void(0);">
-					<input type="hidden" name="productCategoryId" id="productCategoryId" value="">
+				<form id='updateProductCatForm' action="javascript:void(0);"
+					novalidate>
+					<input type="hidden" name="productCategoryId"
+						id="productCategoryId" value="">
 					<div class="form-group">
 						<label for="categoryName">CategoryName</label> <input type="text"
 							class="form-control" name="categoryName" id="categoryName"
@@ -99,9 +149,10 @@
 						class="btn btn-danger cancelBtn">Cancel</button>
 				</form>
 			</div>
+
 			<div id="createProductDiv" class="hide col-lg-8">
 				<h1>Create Product</h1>
-				<form action="javascript:void(0);">
+				<form action="javascript:void(0);" novalidate>
 					<div class="form-group">
 						<label for="name">Product Name</label> <input type="text"
 							class="form-control" name="name" id="test" placeholder="Name"
@@ -138,13 +189,14 @@
 						class="btn btn-danger cancelBtn">Cancel</button>
 				</form>
 			</div>
-			
+
 			<div id="updateProductDiv" class="hide col-lg-8">
 				<h1>Update Product</h1>
-				<form id="updateForm" action="javascript:void(0);">
+				<form id="updateForm" action="javascript:void(0);" novalidate>
 					<input type="hidden" name="productId" id="productId" value="">
-					<input type="hidden" name="productCategoryId" id="productCategoryId" value="">
-					
+					<input type="hidden" name="productCategoryId"
+						id="productCategoryId" value="">
+
 					<div class="form-group">
 						<label for="name">Product Name</label> <input type="text"
 							class="form-control" name="name" id="name" placeholder="Name"
