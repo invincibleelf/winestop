@@ -44,6 +44,7 @@ google.devrel.userAuthed = function() {
 					document.getElementById('signinButton').innerHTML = 'Hi, '
 							+ resp.email;
 					google.devrel.listProducts();
+					google.devrel.getProductCat();
 				} else {
 					console.log(resp);
 					var message = resp.code + " : " + resp.message;
