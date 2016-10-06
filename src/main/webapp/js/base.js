@@ -36,6 +36,8 @@ google.devrel.productsToSell = [];
 google.devrel.totalItems = 0;
 
 google.devrel.totalPrice = 0;
+
+google.devrel.productsForCatProductTable = [];
 /**
  * Loads the application UI after the user has completed auth.
  */
@@ -170,6 +172,7 @@ google.devrel.enableButtons = function() {
 		document.getElementById("productsDiv").classList.add('hide');
 		document.getElementById("productsDiv").classList.remove('show');
 		google.devrel.initProductSellTable(event);
+		google.devrel.initCategoriesSellDiv(event);
 	}
 
 	document.getElementById('barcodeScanner').addEventListener("keyup",
@@ -630,7 +633,6 @@ google.devrel.addProductByBarcode = function(event) {
 					google.devrel.totalPrice += resp.price;
 					resp.saleQuantity = 1;
 					resp.totalPrice = resp.price;
-					console.log(resp);
 					google.devrel.updateproductsinSalesTable(
 							google.devrel.productsToSell, resp);
 
@@ -638,7 +640,8 @@ google.devrel.addProductByBarcode = function(event) {
 							google.devrel.productsToSell, document
 									.getElementById('salesTable'));
 
-					google.devrel.updateSalesStats(document.getElementById('discountSale').value);
+					google.devrel.updateSalesStats(document
+							.getElementById('discountSale').value);
 				} else {
 					var message = resp.code + " : " + resp.message;
 					utils.createMessageDiv(document.getElementById('message'),
@@ -680,22 +683,109 @@ google.devrel.updateSalesStats = function(discount) {
 google.devrel.getDiscountCode = function(event) {
 	console.log("Initiating API call to get discount");
 
-	gapi.client.winestop.getDiscountAmount({
-		discountCode : document.getElementById('discountCode').value
+	gapi.client.winestop
+			.getDiscountAmount({
+				discountCode : document.getElementById('discountCode').value
+			})
+			.execute(
+					function(resp) {
+						if (!resp.code) {
+							console.log(resp);
+							document.getElementById('discountSale').value = resp.amount;
+							google.devrel.updateSalesStats(resp.amount);
+							document.getElementById('discountCode').readOnly = true;
+
+						} else {
+							var message = resp.code + " : " + resp.message;
+							utils.createMessageDiv(document
+									.getElementById('message'), message, false);
+						}
+					})
+}
+
+google.devrel.initCategoriesSellDiv = function(event) {
+	google.devrel.getProductCat();
+	var categoryBtnDiv = document.getElementById('categoriesBtnDiv');
+	utils.createBtnAccordingToCategories(google.devrel.productCategories,
+			categoryBtnDiv);
+	google.devrel.initProductCategoriesTable();
+
+}
+
+google.devrel.getProductByCategories = function(event) {
+	console
+			.log("Initiating api call for getting products filter by categories")
+
+	gapi.client.winestop.getAllProductsByCategories({
+		id : event.target.id,
 	}).execute(
 			function(resp) {
 				if (!resp.code) {
-					console.log(resp);
-					document.getElementById('discountSale').value = resp.amount;
-					google.devrel.updateSalesStats(resp.amount);
-					document.getElementById('discountCode').readOnly=true;
-					
+					console.log(resp.items);
+					google.devrel.productsForCatProductTable = resp.items;
+					var table = document
+							.getElementById('categoriesProductTable');
+					$(table).bootstrapTable('load',
+							google.devrel.productsForCatProductTable);
+
 				} else {
 					var message = resp.code + " : " + resp.message;
 					utils.createMessageDiv(document.getElementById('message'),
 							message, false);
 				}
-			})
+			});
+}
+
+google.devrel.initProductCategoriesTable = function(event) {
+	var table = document.getElementById('categoriesProductTable');
+	$(table).bootstrapTable({
+		columns : [ {
+			field : 'operate',
+			title : 'Add Item',
+			align : 'center',
+			events : operateEventsForSaleByCat,
+			formatter : utils.operateFormatterForSaleByCat
+		}, {
+			field : "name",
+			title : "Product",
+			sortable : true,
+			editable : true,
+			align : 'center'
+		}, {
+			field : "price",
+			title : "Unit Price",
+			sortable : true,
+			editable : true,
+			align : 'center'
+		}, {
+			field : "quantity",
+			title : "Quantity",
+			sortable : true,
+			editable : true,
+			align : 'center'
+		}],
+		data : google.devrel.productsForCatProductTable
+	});
+}
+
+google.devrel.addItemsFromSaleCatTable = function (event,data){
+	console.log(data);
+	google.devrel.totalItems += 1;
+	google.devrel.totalPrice += data.price;
+	if(!data.saleQuantity) {
+		console.log("Doesnot exists");
+		data.saleQuantity = 1;
+	}
+	data.totalPrice = data.price;
+	google.devrel.updateproductsinSalesTable(
+			google.devrel.productsToSell, data);
+
+	google.devrel.updateProductSellTable(
+			google.devrel.productsToSell, document
+					.getElementById('salesTable'));
+
+	google.devrel.updateSalesStats(document
+			.getElementById('discountSale').value);
 }
 /**
  * 

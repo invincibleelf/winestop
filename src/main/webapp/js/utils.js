@@ -58,10 +58,24 @@ utils.operateFormatterForSale = function(value, row, index) {
 
 window.operateEventsForSale = {
 	'click .remove' : function(e, value, row, index) {
-		console.log("test");
+		console.log("not implemented");
 	}
 
 };
+
+utils.operateFormatterForSaleByCat  = function(value, row, index) {
+	return [
+			'<a class="add tweakedpadding" href="javascript:void(0)" title="add">',
+			'<i class="glyphicon glyphicon-plus"></i>', '</a>' ]
+			.join('');
+}
+
+window.operateEventsForSaleByCat = {
+		'click .add' : function(e, value, row, index) {
+			google.devrel.addItemsFromSaleCatTable(e,row);
+		}
+
+	};
 
 /**
  * Handler of all cancel buttons
@@ -137,5 +151,33 @@ utils.removeOptionsFromSelect = function(selectbox) {
 	var i;
 	for (i = selectbox.options.length - 1; i >= 0; i--) {
 		selectbox.remove(i);
+	}
+}
+
+utils.createBtnAccordingToCategories = function(categories, element){
+	
+	while (element.firstChild) {
+		element.removeChild(element.firstChild);
+	}
+	
+	for(var key in categories){
+		if (!categories.hasOwnProperty(key))
+			continue;
+		var btn = document.createElement('button');
+		var obj = categories[key];
+		for ( var prop in obj) {
+			if (!obj.hasOwnProperty(prop))
+				continue;
+			
+			btn.innerText = obj.categoryName;
+			btn.id = obj.id;
+			btn.className = "btn btn-primary";
+			btn.onclick = function (event){
+				google.devrel.getProductByCategories(event);
+			}
+			
+			element.appendChild(btn);
+			
+		}
 	}
 }

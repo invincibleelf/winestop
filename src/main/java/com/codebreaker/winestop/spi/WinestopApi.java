@@ -375,4 +375,23 @@ public class WinestopApi {
 		
 		return discountCopoun;
 	}
+	
+	@ApiMethod(name = "getAllProductsByCategories", path = "getproducts/{id}", httpMethod = HttpMethod.GET)
+	public List<Product> getAllProductsByCategories(final User user, @Named("id") final Long id) throws UnauthorizedException{
+		if (user == null) {
+			throw new UnauthorizedException(
+					"Authorization required. Please Login to your google account and allow access.");
+		}
+		LOG.info("Query all products by category id");
+		ProductCategory productCategory = ofy().load().key(Key.create(ProductCategory.class,id)).now();
+		
+		if(productCategory == null){
+			throw new NullPointerException("Product category not found");
+		}
+		List<Product> products = ofy().load().type(Product.class).ancestor(productCategory).list();
+		System.out.println(products.size());
+		return products;
+		
+	}
+	
 }
