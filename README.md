@@ -1,5 +1,4 @@
-appengine-endpoints-helloendpoints-java-maven
-=============================================
+
 
 A Point of sale application for wine franchise Google Cloud Endpoints in Java.
 
