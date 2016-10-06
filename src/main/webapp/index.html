@@ -1,115 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Hello Endpoints!</title>
+<title>Winestop</title>
 <!-- <script type="text/javascript" src="/js/base.js"></script> -->
-<script type="text/javascript" src="/js/app.js"></script>
+
 <link type="text/css" rel="stylesheet"
-	href="/bootstrap/css/bootstrap.css" rel="stylesheet">
+	href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link type="text/css" rel="stylesheet"
-	href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-<style type="text/css">
-body {
-	padding-top: 40px;
-	padding-bottom: 40px;
-	background-color: #f5f5f5;
-}
+	href="/bootstrap/css/bootstrap-table.min.css" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="/css/style.css"
+	rel="stylesheet">
 
-blockquote {
-	margin-bottom: 10px;
-	border-left-color: #bbb;
-}
 
-form {
-	margin-top: 10px;
-}
+<link rel="shortcut icon" href="images/favicon.ico" />
 
-.form-signin input[type="text"] {
-	font-size: 16px;
-	height: auto;
-	margin-bottom: 15px;
-	padding: 7px 9px;
-}
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="/bootstrap/js/bootstrap-table.min.js"></script>
 
-.row {
-	margin-left: 0px;
-	margin-top: 10px;
-	overflow: scroll;
-}
-</style>
 </head>
 <body>
+
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container">
-				<button type="button" class="btn btn-navbar" data-toggle="collapse"
-					data-target=".nav-collapse">
-					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="brand" href="#">Hello Endpoints!</a>
-				<div class="nav-collapse collapse pull-right">
-					<a href="javascript:void(0);" class="btn" id="signinButton">Sign
-						in</a>
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Winestop</a>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li><a class="active" href="javascript:void(0);"
+							id="salesButton">Sales</a></li>
+						<li class="active"><a href="javascript:void(0);"
+							id="productsNavButton">Products</a></li>
+						<li><a href="javascript:void(0);" id="reportButton">Report</a></li>
+						<li><a href="javascript:void(0);" id="reportButton">Customers</a></li>
+					</ul>
+
+					<ul class="nav navbar-nav navbar-right">
+						<a href="javascript:void(0);" class="btn btn-default customBtn"
+							id="signinButton">Sign in</a>
+					</ul>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="container">
 
-		<div id="outputLog"></div>
+	<div class="container" style="margin-top: 20px;">
+		<div id="message"></div>
+		<div class="tab-pane hide" id="salesDiv">Sales</div>
+		<div class="tab-pane show " id="productsDiv">
+			<div id="products" class="show">
+				<div class="btn-group col-lg-12 pull-right" role="group"
+					aria-label="...">
+					<button id="addProductBtn"
+						class="btn btn-primary pull-right tweakedmargin-right"
+						onclick="javascript:void(0);">Add product</button>
+					<button id="addProductCatBtn"
+						class="btn btn-primary pull-right tweakedmargin-right"
+						onclick="javascript:void(0);">Add ProductCategory</button>
+				</div>
+				<h4>Products</h4>
+				<table id="table" data-search="true" data-pagination="true">
+				</table>
+			</div>
 
-		<form action="javascript:void(0);">
-			<h2>Get Greeting</h2>
-			<div>
-				<span style="width: 90px; display: inline-block;">Greeting
-					ID: </span><input id="id" />
-			</div>
-			<div>
-				<input id="getGreeting" type="submit" class="btn btn-small"
-					value="Submit">
-			</div>
-		</form>
+			<div id="createProductCatDiv" class="hide col-lg-8">
+				<h1>Create Product Category</h1>
+				<form action="javascript:void(0);">
+					<div class="form-group">
+						<label for="categoryName">CategoryName</label> <input type="text"
+							class="form-control" name="categoryName" id="categoryName"
+							placeholder="Category" required>
+					</div>
 
-		<form action="javascript:void(0);">
-			<h2>List Greetings</h2>
-			<div>
-				<input id="listGreeting" type="submit" class="btn btn-small"
-					value="Submit">
+					<button id="createProductCatBtn" type="submit"
+						class="btn btn-success">Create</button>
+					<button onclick="javascript:void(0);"
+						class="btn btn-danger cancelBtn">Cancel</button>
+				</form>
 			</div>
-		</form>
+			<div id="createProductDiv" class="hide col-lg-8">
+				<h1>Create Product</h1>
+				<form action="javascript:void(0);">
+					<div class="form-group">
+						<label for="name">Product Name</label> <input type="text"
+							class="form-control" name="name" id="test" placeholder="Name"
+							required>
+					</div>
 
-		<form action="javascript:void(0);">
-			<h2>Multiply Greetings</h2>
-			<div>
-				<span style="width: 90px; display: inline-block;">Greeting: </span><input
-					id="greeting" />
-			</div>
-			<div>
-				<span style="width: 90px; display: inline-block;">Count: </span><input
-					id="count" />
-			</div>
-			<div>
-				<input id="multiplyGreetings" type="submit" class="btn btn-small"
-					value="Submit">
-			</div>
-		</form>
+					<div class="form-group">
+						<label for="barcode">Barcode</label> <input type="text"
+							class="form-control" name="barcode" id="barcode"
+							placeholder="Barcode" required>
+					</div>
 
-		<form action="javascript:void(0);">
-			<h2>Authenticated Greeting</h2>
-			<div>
-				<input id="authedGreeting" type="submit" class="btn btn-small"
-					disabled value="Submit">
-			</div>
-		</form>
+					<div class="form-group">
+						<label for="price">Price</label> <input type="number"
+							class="form-control" name="price" id="price" placeholder="Price"
+							step="0.01" required>
+					</div>
 
-		<script type="text/javascript">
-			function init() {
-				google.devrel.winestop.init('//' + window.location.host
-						+ '/_ah/api');
-			}
-		</script>
-		<script src="https://apis.google.com/js/client.js?onload=init"></script>
+					<div class="form-group">
+						<label for="quantity">Quantity</label> <input type="number"
+							class="form-control" name="quantity" id="quantity"
+							placeholder="Quantity" required>
+					</div>
+
+					<div class="form-group">
+						<label for="productCategoriesSel">Product Category</label> <select
+							class="form-control" name="productCategoriesSel"
+							id="productCategoriesSel">
+						</select>
+					</div>
+
+					<button id="createProductBtn" type="submit" class="btn btn-success">Create</button>
+					<button onclick="javascript:void(0);"
+						class="btn btn-danger cancelBtn">Cancel</button>
+				</form>
+			</div>
+
+			<button id="getproductCatBtn" class="btn btn-default">Get It</button>
+
+
+		</div>
+		<div class="tab-pane hide" id="report">report</div>
+		<div class="tab-pane hide" id="settings">customers</div>
 	</div>
+
+	<script type="text/javascript">
+		function init() {
+			google.devrel.init('//' + window.location.host + '/_ah/api');
+		}
+		$(document).ready(function() {
+		});
+	</script>
+	<script type="text/javascript" src="/js/base.js"></script>
+	<script type="text/javascript" src="/js/utils.js"></script>
+	<script src="https://apis.google.com/js/client.js?onload=init"></script>
 </body>
 </html>
