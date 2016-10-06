@@ -82,6 +82,23 @@
 						class="btn btn-danger cancelBtn">Cancel</button>
 				</form>
 			</div>
+			
+			<div id="updateProductCatDiv" class="hide col-lg-8">
+				<h1>Update Product Category</h1>
+				<form id='updateProductCatForm' action="javascript:void(0);">
+					<input type="hidden" name="productCategoryId" id="productCategoryId" value="">
+					<div class="form-group">
+						<label for="categoryName">CategoryName</label> <input type="text"
+							class="form-control" name="categoryName" id="categoryName"
+							placeholder="Category" required>
+					</div>
+
+					<button id="updateProductCatBtn" type="submit"
+						class="btn btn-success">Update</button>
+					<button onclick="javascript:void(0);"
+						class="btn btn-danger cancelBtn">Cancel</button>
+				</form>
+			</div>
 			<div id="createProductDiv" class="hide col-lg-8">
 				<h1>Create Product</h1>
 				<form action="javascript:void(0);">
@@ -121,8 +138,49 @@
 						class="btn btn-danger cancelBtn">Cancel</button>
 				</form>
 			</div>
+			
+			<div id="updateProductDiv" class="hide col-lg-8">
+				<h1>Update Product</h1>
+				<form id="updateForm" action="javascript:void(0);">
+					<input type="hidden" name="productId" id="productId" value="">
+					<input type="hidden" name="productCategoryId" id="productCategoryId" value="">
+					
+					<div class="form-group">
+						<label for="name">Product Name</label> <input type="text"
+							class="form-control" name="name" id="name" placeholder="Name"
+							required>
+					</div>
 
-			<button id="getproductCatBtn" class="btn btn-default">Get It</button>
+					<div class="form-group">
+						<label for="barcode">Barcode</label> <input type="text"
+							class="form-control" name="barcode" id="barcode"
+							placeholder="Barcode" required>
+					</div>
+
+					<div class="form-group">
+						<label for="price">Price</label> <input type="number"
+							class="form-control" name="price" id="price" placeholder="Price"
+							step="0.01" required>
+					</div>
+
+					<div class="form-group">
+						<label for="quantity">Quantity</label> <input type="number"
+							class="form-control" name="quantity" id="quantity"
+							placeholder="Quantity" required>
+					</div>
+
+					<div class="form-group">
+						<label for="productCategoriesSel">Product Category</label> <select
+							class="form-control" name="productCategoriesSel"
+							id="productCategoriesSel">
+						</select>
+					</div>
+
+					<button id="updateProductBtn" type="submit" class="btn btn-success">Update</button>
+					<button onclick="javascript:void(0);"
+						class="btn btn-danger cancelBtn">Cancel</button>
+				</form>
+			</div>
 
 
 		</div>

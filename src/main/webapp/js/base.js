@@ -84,74 +84,7 @@ google.devrel.auth = function() {
 	}
 };
 
-/**
- * Prints a greeting to the greeting log. param {Object} greeting Greeting to
- * print.
- */
-google.devrel.print = function(greeting) {
-	var element = document.createElement('div');
-	element.classList.add('row');
-	element.innerHTML = greeting.message;
-	document.getElementById('outputLog').appendChild(element);
-};
 
-/**
- * Gets a numbered greeting via the API.
- * 
- * @param {string}
- *            id ID of the greeting.
- */
-google.devrel.getGreeting = function(id) {
-	gapi.client.winestop.winestopApi.getGreeting({
-		'id' : id
-	}).execute(function(resp) {
-		if (!resp.code) {
-			google.devrel.print(resp);
-		}
-	});
-};
-
-/**
- * Lists greetings via the API.
- */
-google.devrel.listGreeting = function() {
-	gapi.client.winestop.winestopApi.listGreeting().execute(function(resp) {
-		if (!resp.code) {
-			resp.items = resp.items || [];
-			for (var i = 0; i < resp.items.length; i++) {
-				google.devrel.print(resp.items[i]);
-			}
-		}
-	});
-};
-
-/**
- * Gets a greeting a specified number of times.
- * 
- * @param {string}
- *            greeting Greeting to repeat.
- * @param {string}
- *            count Number of times to repeat it.
- */
-google.devrel.multiplyGreeting = function(greeting, times) {
-	gapi.client.winestop.multiply({
-		'message' : greeting,
-		'times' : times
-	}).execute(function(resp) {
-		if (!resp.code) {
-			google.devrel.print(resp);
-		}
-	});
-};
-
-/**
- * Greets the current user via the API.
- */
-google.devrel.authedGreeting = function(id) {
-	gapi.client.winestop.authed().execute(function(resp) {
-		google.devrel.print(resp);
-	});
-};
 
 /**
  * Display List of users
@@ -188,10 +121,6 @@ google.devrel.enableButtons = function() {
 
 	}
 
-	document.getElementById('getproductCatBtn').onclick = function() {
-		google.devrel.getProductCat();
-	}
-
 	document.getElementById('addProductCatBtn').onclick = function(event) {
 		google.devrel.previousDiv = event.target.parentElement.parentElement;
 		utils.showNextView(event.target, document
@@ -201,6 +130,10 @@ google.devrel.enableButtons = function() {
 	document.getElementById('createProductCatBtn').onclick = function(event) {
 		google.devrel.createProductsCat(event, document
 				.getElementById('categoryName').value);
+	}
+
+	document.getElementById('updateProductCatBtn').onclick = function(event) {
+		google.devrel.updateProductCategory(event);
 	}
 
 	document.getElementById('addProductBtn').onclick = function(event) {
@@ -216,6 +149,10 @@ google.devrel.enableButtons = function() {
 
 	document.getElementById('createProductBtn').onclick = function(event) {
 		google.devrel.createProduct(event);
+	}
+
+	document.getElementById('updateProductBtn').onclick = function(event) {
+		google.devrel.updateProduct(event);
 	}
 
 	/**
@@ -258,6 +195,53 @@ google.devrel.createProductsCat = function(event, categoryName) {
 							message, false);
 				}
 			});
+}
+
+google.devrel.showUpdateProductCatDiv = function(event, row) {
+	google.devrel.previousDiv = document.getElementById('products');
+	document.getElementById('products').classList.add('hide');
+	document.getElementById('products').classList.remove('show');
+	document.getElementById('updateProductCatDiv').classList.add('show');
+	document.getElementById('updateProductCatDiv').classList.remove('hide');
+
+	var c = document.getElementById('updateProductCatForm').elements;
+	for ( var key in row) {
+		for (var i = 0; i < c.length; i++) {
+			if (c[i].tagName === "INPUT" && c[i].name === key) {
+				c[i].value = row[key];
+			}
+
+		}
+	}
+
+}
+
+google.devrel.updateProductCategory = function(event) {
+	console.log("Intiating Api call to update category");
+	var formElements = event.target.parentElement.elements;
+
+	var data = {
+		categoryName : formElements.namedItem('categoryName').value,
+		productCategoryId : formElements.namedItem('productCategoryId').value,
+	}
+
+	gapi.client.winestop.updateProductCategory(data).execute(
+			function(resp) {
+				if (!resp.code) {
+					utils.showPreviousView(event.target,
+							google.devrel.previousDiv);
+					var message = resp.categoryName + ' product category updated successfully.';
+					utils.createMessageDiv(document.getElementById('message'),
+							message, true);
+					google.devrel.refreshTableAfterProductCategoryUpdate(
+							google.devrel.products, data, $('table'));
+				}else {
+					var message = resp.code + " : " + resp.message;
+					utils.createMessageDiv(document.getElementById('message'),
+							message, false);
+				}
+			});
+
 }
 
 google.devrel.getProductCat = function() {
@@ -324,9 +308,9 @@ google.devrel.addCreatedProductToTableAndRefresh = function(data) {
  * Updates the table data in client side after deleting product
  */
 google.devrel.deleteProductAndRefreshTable = function(data) {
-	for (var key in google.devrel.products) {
-		if(google.devrel.products[key].productId == data.productId ) {
-			google.devrel.products.splice(key,1);
+	for ( var key in google.devrel.products) {
+		if (google.devrel.products[key].productId == data.productId) {
+			google.devrel.products.splice(key, 1);
 		}
 	}
 	$('table').bootstrapTable('load', google.devrel.products);
@@ -441,25 +425,112 @@ google.devrel.initTable = function(properties, element, tableData) {
 	});
 }
 
+/**
+ * Remove Selected product
+ * 
+ * @param {object}
+ *            row Product object to be removed.
+ */
 google.devrel.removeProduct = function(row) {
 	console.log("Initiating API call to remove product");
-	
-	
-	
+
 	gapi.client.winestop.deleteProduct({
 		productId : row.productId,
 		productCategoryId : row.productCategoryId
-	}).execute(function(resp) {
-		if (!resp.code) {
-			var message = row.name + ' product deleted successfully.';
-			utils.createMessageDiv(document.getElementById('message'),
-					message, true);
-			google.devrel.deleteProductAndRefreshTable(row);
-		}
-	});
+	}).execute(
+			function(resp) {
+				if (!resp.code) {
+					var message = row.name + ' product deleted successfully.';
+					utils.createMessageDiv(document.getElementById('message'),
+							message, true);
+					google.devrel.deleteProductAndRefreshTable(row);
+				}
+			});
 }
 
+google.devrel.showUpdateProductDiv = function(event, row) {
+	google.devrel.previousDiv = document.getElementById('products');
+	document.getElementById('products').classList.add('hide');
+	document.getElementById('products').classList.remove('show');
+	document.getElementById('updateProductDiv').classList.add('show');
+	document.getElementById('updateProductDiv').classList.remove('hide');
 
+	var c = document.getElementById('updateForm').elements;
+	for ( var key in row) {
+		for (var i = 0; i < c.length; i++) {
+			if (c[i].tagName === "INPUT" && c[i].name === key) {
+				c[i].value = row[key];
+			}
+
+			if (c[i].tagName === "SELECT") {
+				utils.addOptionValuesToSelectDiv(c[i],
+						google.devrel.productCategories, "id", "categoryName");
+				c[i].value = row.productCategoryId;
+			}
+		}
+	}
+
+}
+
+google.devrel.updateProduct = function(event) {
+	console.log("Initiating create product");
+
+	var formElements = event.target.parentElement.elements;
+
+	var s = formElements.namedItem('productCategoriesSel');
+
+	var data = {
+		name : formElements.namedItem('name').value,
+		barcode : formElements.namedItem('barcode').value,
+		price : formElements.namedItem('price').value,
+		quantity : formElements.namedItem('quantity').value,
+		newProductCategoryId : s.options[s.selectedIndex].value,
+		categoryName : s.options[s.selectedIndex].text,
+		discountType : "NONE",
+		discountValue : 0,
+		productId : formElements.namedItem('productId').value,
+		productCategoryId : formElements.namedItem('productCategoryId').value,
+	}
+
+	gapi.client.winestop.updateProduct(data).execute(
+			function(resp) {
+				if (!resp.code) {
+					utils.showPreviousView(event.target,
+							google.devrel.previousDiv);
+					var message = resp.name + ' product updated successfully.';
+					utils.createMessageDiv(document.getElementById('message'),
+							message, true);
+					google.devrel.refreshTableAfterProductUpdate(
+							google.devrel.products, data, $('table'));
+				}
+			});
+
+}
+
+google.devrel.refreshTableAfterProductUpdate = function(products, data, table) {
+	for ( var key in products) {
+		if (products[key].productId == data.productId) {
+			products[key].name = data.name;
+			products[key].barcode = data.barcode;
+			products[key].quantity = data.quantity;
+			products[key].categoryName = data.categoryName;
+			products[key].discountType = data.discountType;
+			products[key].discountValue = data.discountValue;
+			products[key].discountType = data.discountType;
+			products[key].productCategoryId = data.productCategoryId;
+		}
+	}
+	$(table).bootstrapTable('load', google.devrel.products);
+}
+
+google.devrel.refreshTableAfterProductCategoryUpdate = function (products, data, table) {
+	for ( var key in products) {
+		if (products[key].productCategoryId == data.productCategoryId) {
+			products[key].categoryName = data.categoryName;
+		}
+	}
+	$(table).bootstrapTable('load', google.devrel.products);
+}
 /**
  * Initializes the application.
  * 

@@ -39,146 +39,7 @@ public class WinestopApi {
 
 	private static final Logger LOG = Logger.getLogger(WinestopApi.class.getName());
 
-	public static ArrayList<HelloGreeting> greetings = new ArrayList<HelloGreeting>();
-
 	private ValidationUtil validationForm = new ValidationUtilImpl();
-
-	static {
-		greetings.add(new HelloGreeting("hello world!"));
-		greetings.add(new HelloGreeting("goodbye world!"));
-	}
-
-	private static String extractDefaultDisplayNameFromEmail(String email) {
-		return email == null ? null : email.substring(0, email.indexOf("@"));
-	}
-
-	public HelloGreeting getGreeting(@Named("id") Integer id) throws NotFoundException {
-		try {
-			return greetings.get(id);
-		} catch (IndexOutOfBoundsException e) {
-			throw new NotFoundException("Greeting not found with an index: " + id);
-		}
-	}
-
-	public ArrayList<HelloGreeting> listGreeting() {
-		return greetings;
-	}
-
-	// [START multiplygreetings]
-
-	@ApiMethod(name = "multiply", httpMethod = "post")
-	public HelloGreeting insertGreeting(@Named("times") Integer times, HelloGreeting greeting) {
-		HelloGreeting response = new HelloGreeting();
-		StringBuilder responseBuilder = new StringBuilder();
-		for (int i = 0; i < times; i++) {
-			responseBuilder.append(greeting.getMessage());
-		}
-		response.setMessage(responseBuilder.toString());
-		return response;
-	}
-	// [END multiplygreetings]
-	// [START auth]
-
-	@ApiMethod(name = "authed", httpMethod = "get")
-	public HelloGreeting authedGreeting(final User user) throws UnauthorizedException {
-		// If the user is not logged in, throw an UnauthorizedException
-		if (user == null) {
-			throw new UnauthorizedException(
-					"Authorization required. Please Login to your google account and allow access.");
-		}
-		HelloGreeting response = new HelloGreeting("hello " + user.getEmail());
-		return response;
-	}
-	// [END auth]
-
-	// Declare this method as a method available externally through Endpoints
-	@ApiMethod(name = "saveProfile", path = "profile", httpMethod = HttpMethod.POST)
-
-	// The request that invokes this method should provide data that
-	// conforms to the fields defined in ProfileForm
-
-	// TODO 1 Pass the ProfileForm parameter
-	// TODO 2 Pass the User parameter
-	public Profile saveProfile(final User user, final ProfileForm profileForm) throws UnauthorizedException {
-
-		String email = "";
-		String displayName = "";
-		Role role = Role.CASHIER;
-
-		// If the user is not logged in, throw an UnauthorizedException
-		if (user == null) {
-			throw new UnauthorizedException(
-					"Authorization required. . Please Login to your google account and allow access.");
-		}
-
-		/*
-		 * Profile profile = ofy().load().key(Key.create(Profile.class,
-		 * user.getEmail())).now();
-		 * 
-		 * if(profile == null && profile.getRole() != Role.ADMIN){ throw new
-		 * UnauthorizedException("User Authentication Needed"); }
-		 */
-
-		// Set the Role to the value sent by the ProfileForm
-		if (profileForm.getRole() != null) {
-			role = profileForm.getRole();
-		}
-
-		// Set the displayName to the value sent by the ProfileForm
-		displayName = profileForm.getDisplayName();
-
-		// TODO 2
-		// Get the userId and mainEmail
-		email = user.getEmail();
-
-		// TODO 2
-		// If the displayName is null, set it to the default value based on the
-		// user's email
-		// by calling extractDefaultDisplayNameFromEmail(...)
-		if (displayName == null) {
-			displayName = extractDefaultDisplayNameFromEmail(user.getEmail());
-		}
-
-		// Create a new Profile entity from the
-		// email, displayName and role
-		Profile newProfile = new Profile(email, displayName, role);
-
-		// Save the entity in the datastore
-		ofy().save().entity(newProfile).now();
-
-		// Return the profile
-		return newProfile;
-	}
-
-	/**
-	 * Returns a Profile object associated with the given user object. The cloud
-	 * endpoints system automatically inject the User object.
-	 *
-	 * @param user
-	 *            A User object injected by the cloud endpoints.
-	 * @return Profile object.
-	 * @throws UnauthorizedException
-	 *             when the User object is null.
-	 */
-	@ApiMethod(name = "getProfile", path = "profile", httpMethod = HttpMethod.GET)
-	public Profile getProfile(final User user) throws UnauthorizedException {
-		if (user == null) {
-			throw new UnauthorizedException(
-					"Authorization required. Please Login to your google account and allow access.");
-		}
-
-		String userName = user.getEmail();
-
-		Profile profile = ofy().load().key(Key.create(Profile.class, userName)).now();
-
-		if (profile == null) {
-			throw new UnauthorizedException("No user found");
-		}
-
-		return profile;
-	}
-
-	
 
 	/**
 	 * Returns a ProductCategory object. The cloud endpoints system
@@ -221,6 +82,44 @@ public class WinestopApi {
 		return productCategory;
 	}
 
+	@ApiMethod(name = "updateProductCategory", path = "updateproductcategory", httpMethod = HttpMethod.POST)
+	public ProductCategory updateProductCategory(final User user, final ProductForm productForm) throws UnauthorizedException, CustomException {
+		if (user == null) {
+			throw new UnauthorizedException(
+					"Authorization required. Please Login to your google account and allow access.");
+		}
+
+		if (productForm.getCategoryName().isEmpty()) {
+			throw new NullPointerException("Name of product Categories is Required");
+		}
+		
+		if(productForm.getProductCategoryId() ==0){
+			throw new NullPointerException("Product Categories not found");
+		}
+		
+		LOG.info("Get Product Categories for updating");
+		ProductCategory productCategory = ofy().load().key(Key.create(ProductCategory.class,productForm.getProductCategoryId())).now();
+		if(productCategory == null){
+			throw new NullPointerException("Product Categories not found");
+		}
+		
+		if(!productCategory.getCategoryName().equals(productForm.getCategoryName())){
+			LOG.info("Check if updated product category name already exists");
+			Iterable<Key<ProductCategory>> productCategoriesKeys = queryproductCategoriesByCategoryName(productForm);
+			System.out.println(Iterables.size(productCategoriesKeys));
+			if (Iterables.size(productCategoriesKeys) > 0) {
+				 throw new CustomException("Product Category already exists");
+			}
+		}
+		
+		productCategory.setCategoryName(productForm.getCategoryName());
+		
+		ofy().save().entity(productCategory).now();
+		
+		return productCategory;
+		
+	}
+	
 	private QueryKeys<ProductCategory> queryproductCategoriesByCategoryName(final ProductForm productForm) {
 		return ofy().load().type(ProductCategory.class).filter("categoryName", productForm.getCategoryName()).keys();
 	}
@@ -394,5 +293,42 @@ public class WinestopApi {
 		
 		ofy().delete().entity(product).now();
 		
+	}
+	
+	@ApiMethod(name = "updateProduct", path="updateproduct" ,httpMethod = HttpMethod.POST)
+	public Product updateProduct(final User user,final ProductForm productForm) throws UnauthorizedException {
+		if (user == null) {
+			throw new UnauthorizedException(
+					"Authorization required. Please Login to your google account and allow access.");
+		}
+		if(productForm.getProductId() == 0 || productForm.getProductCategoryId() == 0) {
+			throw new NullPointerException("ProductId is null");
+		}
+		
+		if (!validationForm.validateProductFormFields(productForm)) {
+			throw new NullPointerException("Required Fields are missing.");
+		}
+		
+		productForm.setDiscountType(Discount.NONE);
+		productForm.setDiscountValue(0);
+
+		LOG.info("Find product in datastore by ID:"+productForm.getProductId());
+		Product product = ofy().load().key(Key.create(Key.create(ProductCategory.class,productForm.getProductCategoryId()),Product.class,productForm.getProductId())).now();
+		
+		if(product == null){
+			throw new NullPointerException("Product is not found");
+		}
+		
+		product.setBarcode(productForm.getBarcode());
+		product.setName(productForm.getName());
+		product.setPrice(productForm.getPrice());
+		product.setQuantity(productForm.getQuantity());
+		product.setDiscountType(productForm.getDiscountType());
+		product.setDiscountValue(productForm.getDiscountValue());
+		product.setTheCategory(Key.create(ProductCategory.class,productForm.getNewProductCategoryId()));
+		
+		LOG.info("Saving product");
+		ofy().save().entity(product).now();
+		return product;
 	}
 }

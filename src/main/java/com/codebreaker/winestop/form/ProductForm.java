@@ -1,7 +1,6 @@
 package com.codebreaker.winestop.form;
 
 import com.codebreaker.winestop.util.Discount;
-import com.google.api.server.spi.config.Named;
 
 public class ProductForm {
 
@@ -22,6 +21,8 @@ public class ProductForm {
 	private Discount discountType = Discount.NONE;
 
 	private double discountValue;
+	
+	private Long newProductCategoryId;
 
 	/**
      * Default Constructor Required for omiting JACKSON Error
@@ -106,6 +107,14 @@ public class ProductForm {
 
 	public void setDiscountValue(double discountValue) {
 		this.discountValue = discountValue;
+	}
+
+	public Long getNewProductCategoryId() {
+		return newProductCategoryId;
+	}
+
+	public void setNewProductCategoryId(Long newProductCategoryId) {
+		this.newProductCategoryId = newProductCategoryId;
 	}
 	
 	

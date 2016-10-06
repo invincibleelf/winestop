@@ -24,25 +24,29 @@ utils.createForm = function() {
 }
 
 utils.operateFormatter = function(value, row, index) {
-	return [ '<a class="update" href="javascript:void(0)" title="update">',
-			'<i class="glyphicon glyphicon-pencil"></i>', '</a>  ',
-			'<a class="remove" href="javascript:void(0)" title="delete">',
-			'<i class="glyphicon glyphicon-remove-circle"></i>', '</a>' ]
-			.join('');
+	return [
+			'<a class="update tweakedpadding" href="javascript:void(0)" title="update">',
+			'<i class="glyphicon glyphicon-pencil"></i>',
+			'</a>  ',
+			'<a class="remove tweakedpadding" href="javascript:void(0)" title="delete">',
+			'<i class="glyphicon glyphicon-remove-circle"></i>',
+			'</a>',
+			'<a class="update-cat tweakedpadding" href="javascript:void(0)" title="update category">',
+			'<i class="glyphicon glyphicon-plus"></i>', '</a>  ' ].join('');
 }
 
 window.operateEvents = {
 	'click .update' : function(e, value, row, index) {
-		alert('You click like action, row: ' + JSON.stringify(row));
+		google.devrel.showUpdateProductDiv(e, row);
 	},
 	'click .remove' : function(e, value, row, index) {
+
 		google.devrel.removeProduct(row);
-		
-		/*$('#table').bootstrapTable('remove', {
-			field : 'id',
-			values : [ row.id ]
-		});*/
+	},
+	'click .update-cat' : function(e, value, row, index) {
+		google.devrel.showUpdateProductCatDiv(e,row);
 	}
+
 };
 
 /**
