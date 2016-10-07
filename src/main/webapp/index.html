@@ -69,9 +69,9 @@
 							placeholder="" required readonly>
 					</div>
 					<div class="form-group col-lg-6">
-						<label for="totalPrice">Total Quantity</label> <input type="number"
-							class="form-control" name="totalQuantity" id="totalQuantity"
-							placeholder="" required readonly>
+						<label for="totalQuantity">Total Quantity</label> <input
+							type="number" class="form-control" name="totalQuantity"
+							id="totalQuantity" placeholder="" required readonly>
 					</div>
 					<div class="form-group col-lg-6">
 						<label for="discountCode">Discount Code</label> <input type="text"
@@ -79,9 +79,9 @@
 							placeholder="Discount Code">
 					</div>
 					<div class="form-group col-lg-6">
-						<label for="discountSale">Sale Discount</label> <input type="number"
-							class="form-control" name="discountSale" id="discountSale"
-							value="0" required readonly>
+						<label for="discountSale">Sale Discount</label> <input
+							type="number" class="form-control" name="discountSale"
+							id="discountSale" value="0" required readonly>
 					</div>
 					<div class="form-group">
 						<label for="payingPrice">Paying Price</label> <input type="number"
@@ -89,18 +89,21 @@
 							value="0" required readonly>
 					</div>
 					<div class="form-group"></div>
-					<button id="payAmountCashBtn" onclick="javascript:void(0);" class="btn btn-success">Cash</button>
-					<button id="payAmountCreditBtn" onclick="javascript:void(0);" class="btn btn-success">Credit</button>
+					<button id="payAmountCashBtn" onclick="javascript:void(0);"
+						class="btn btn-success">Cash</button>
+					<button id="payAmountCreditBtn" onclick="javascript:void(0);"
+						class="btn btn-success">Credit</button>
 				</form>
 
 
 			</div>
 			<div class="col-lg-6 pull-right">
 				<h3>Available Categories</h3>
-				<div id="categoriesBtnDiv" class="btn-group"></div>
-				
-				
-				<table id="categoriesProductTable" class="table">
+				<div id="categoriesBtnDiv" class="btn-group form-group"></div>
+
+
+				<table id="categoriesProductTable" class="table" data-search="true"
+					data-pagination="true">
 
 				</table>
 			</div>
@@ -115,10 +118,12 @@
 					<button id="addProductCatBtn"
 						class="btn btn-primary pull-right tweakedmargin-right"
 						onclick="javascript:void(0);">Add ProductCategory</button>
+
 				</div>
 				<h4>Products</h4>
 				<table id="productTable" data-search="true" data-pagination="true">
 				</table>
+
 			</div>
 
 			<div id="createProductCatDiv" class="hide col-lg-8">

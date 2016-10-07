@@ -12,7 +12,10 @@ import com.codebreaker.winestop.Constants;
 import com.codebreaker.winestop.domain.DiscountCopoun;
 import com.codebreaker.winestop.domain.Product;
 import com.codebreaker.winestop.domain.ProductCategory;
+import com.codebreaker.winestop.domain.SalesTransaction;
 import com.codebreaker.winestop.form.ProductForm;
+import com.codebreaker.winestop.form.SalesProductForm;
+import com.codebreaker.winestop.form.SalesTransactionForm;
 import com.codebreaker.winestop.util.CustomException;
 import com.codebreaker.winestop.util.Discount;
 import com.codebreaker.winestop.util.ValidationUtil;
@@ -392,6 +395,38 @@ public class WinestopApi {
 		System.out.println(products.size());
 		return products;
 		
+	}
+	@ApiMethod(name = "salesTransactionByCash", path = "saletransaction/", httpMethod = HttpMethod.POST)
+	public SalesTransaction salesTransactionByCash(final User user,final SalesTransactionForm salesTransactionForm) throws UnauthorizedException{
+		
+		if (user == null) {
+			throw new UnauthorizedException(
+					"Authorization required. Please Login to your google account and allow access.");
+		}
+		
+		
+		SalesTransaction salesTransaction = new SalesTransaction();
+		
+		salesTransaction.setDiscountCode(salesTransactionForm.getDiscountCode());
+		salesTransaction.setPayingPrice(salesTransactionForm.getPayingPrice());
+		
+		
+		List<SalesProductForm> salesProductForms = salesTransactionForm.getProductForms();
+		
+		if(salesProductForms.size() == 0){
+			throw new NullPointerException("Products not found for sale");
+		}
+		
+		List<Long> productIds = new ArrayList<>();
+		
+		for (SalesProductForm salesProductForm : salesProductForms) {
+			productIds.add(salesProductForm.getId());
+		}
+		
+		salesTransaction.setProductIds(productIds);
+		ofy().save().entity(salesTransaction).now();
+		
+		return salesTransaction;
 	}
 	
 }

@@ -4,6 +4,7 @@ import com.codebreaker.winestop.domain.DiscountCopoun;
 import com.codebreaker.winestop.domain.Product;
 import com.codebreaker.winestop.domain.ProductCategory;
 import com.codebreaker.winestop.domain.Profile;
+import com.codebreaker.winestop.domain.SalesTransaction;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
@@ -17,6 +18,7 @@ public class OfyService {
         factory().register(ProductCategory.class);
         factory().register(Product.class);
         factory().register(DiscountCopoun.class);
+        factory().register(SalesTransaction.class);
     }
     
     public static Objectify ofy() {

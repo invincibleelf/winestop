@@ -192,6 +192,10 @@ google.devrel.enableButtons = function() {
 					google.devrel.getDiscountCode(event);
 				}
 			});
+
+	document.getElementById('payAmountCashBtn').onclick = function(event) {
+		google.devrel.salesTransactionByCash(event);
+	}
 	/**
 	 * Creating button onclick handler for all the Buttons with class cancel
 	 * 
@@ -763,29 +767,60 @@ google.devrel.initProductCategoriesTable = function(event) {
 			sortable : true,
 			editable : true,
 			align : 'center'
-		}],
+		} ],
 		data : google.devrel.productsForCatProductTable
 	});
 }
 
-google.devrel.addItemsFromSaleCatTable = function (event,data){
+google.devrel.addItemsFromSaleCatTable = function(event, data) {
 	console.log(data);
 	google.devrel.totalItems += 1;
 	google.devrel.totalPrice += data.price;
-	if(!data.saleQuantity) {
+	if (!data.saleQuantity) {
 		console.log("Doesnot exists");
 		data.saleQuantity = 1;
 	}
 	data.totalPrice = data.price;
-	google.devrel.updateproductsinSalesTable(
-			google.devrel.productsToSell, data);
+	google.devrel
+			.updateproductsinSalesTable(google.devrel.productsToSell, data);
 
-	google.devrel.updateProductSellTable(
-			google.devrel.productsToSell, document
-					.getElementById('salesTable'));
+	google.devrel.updateProductSellTable(google.devrel.productsToSell, document
+			.getElementById('salesTable'));
 
-	google.devrel.updateSalesStats(document
-			.getElementById('discountSale').value);
+	google.devrel
+			.updateSalesStats(document.getElementById('discountSale').value);
+}
+
+google.devrel.salesTransactionByCash = function(event) {
+	console.log("Inititating Api call for sales transaction");
+	gapi.client.winestop.salesTransactionByCash({
+		discountCode : document.getElementById('discountCode').value,
+		payingPrice : document.getElementById('payingPrice').value,
+		productForms : google.devrel.productsToSell
+
+	}).execute(
+			function(resp) {
+				if (!resp.code) {
+					var message ='Sale transaction created successfully.';
+					utils.createMessageDiv(document.getElementById('message'),
+							message, true);
+					
+					google.devrel.productsToSell = [];
+					google.devrel.totalItems = 0;
+
+					google.devrel.totalPrice = 0;
+					var table = document.getElementById('salesTable');
+					$(table).bootstrapTable("load",google.devrel.productsToSell);
+					document.getElementById('totalPrice').value = 0;
+					document.getElementById('totalQuantity').value = 0;
+					
+				} else {
+					var message = resp.code + " : " + resp.message;
+					utils.createMessageDiv(document.getElementById('message'),
+							message, false);
+				}
+			});
+
 }
 /**
  * 
