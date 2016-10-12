@@ -49,14 +49,14 @@ google.devrel.userAuthed = function() {
 					console.log(resp);
 					google.devrel.signedIn = true;
 					document.getElementById('signinButton').innerHTML = 'Hi, '
-							+ resp.email;
+							+ resp.email+', Logout';
 					// google.devrel.listProducts();
 					// google.devrel.getProductCat();
 				} else {
-					console.log(resp);
+					/*console.log(resp);
 					var message = resp.code + " : " + resp.message;
 					utils.createMessageDiv(document.getElementById('message'),
-							message, false);
+							message, false);*/
 				}
 
 			});
@@ -86,6 +86,8 @@ google.devrel.auth = function() {
 		google.devrel.signin(false, google.devrel.userAuthed);
 	} else {
 		google.devrel.signedIn = false;
+		gapi.auth.signOut();
+		gapi.auth.setToken({access_token: ''});
 		document.getElementById('signinButton').innerHTML = 'Sign in';
 
 	}

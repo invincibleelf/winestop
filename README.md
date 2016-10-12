@@ -14,7 +14,13 @@ A Point of sale application for wine franchise Google Cloud Endpoints in Java.
 - [Google App Engine Maven plugin][4]
 
 ## About
-1. Write about product
+1. 
+
+## Instruction
+- Add your application id at application-web.xml.
+- Run mvn clean install
+- To run in development environment, mvn appengine:devserver
+- To deploy in GAE, mvn appengine:update
 
 
 [1]: https://developers.google.com/appengine
